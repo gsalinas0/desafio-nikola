@@ -7,6 +7,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 import pandas as pd
 import os
 from consts import FORM_URL, DATABASE_PATH
+from time import sleep
+from selenium.webdriver.common.keys import Keys
 
 # TODO: Separar funciones en archivos
 
@@ -46,22 +48,40 @@ def start_driver():
     driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
 
-def fill_basic_info(wait_driver_wait, data):
+def fill_address(wait_driver_wait, data):
+    address_input = wait_driver_wait.until(EC.element_to_be_clickable((By.ID, "input_1_20")))
     
-    nombre_input = wait_driver_wait.until(EC.element_to_be_clickable((By.ID, "input_1_1_3")))
-    email_input = wait_driver_wait.until(EC.element_to_be_clickable((By.ID, "input_1_2")))
-    telefono_input = wait_driver_wait.until(EC.element_to_be_clickable((By.ID, "input_1_5")))
+    # Esperar a que el componente de Google Maps se inicialice
+    wait_driver_wait.until(
+        lambda driver: driver.execute_script(
+            'return document.querySelector("#input_1_20").getAttribute("class").includes("pac-target-input")'
+        )
+    )
+
+    address_input.clear()
+    address_input.send_keys(data['address'])
+    wait_driver_wait.until(
+        EC.presence_of_element_located((By.CLASS_NAME, "pac-container"))
+    )
     
-    nombre_input.clear()
-    nombre_input.send_keys(data['name'])
+    address_input.send_keys(Keys.RETURN)
+
+def fill_basic_info(web_driver_wait, data):
+    name_input = web_driver_wait.until(EC.element_to_be_clickable((By.ID, "input_1_1_3")))
+    email_input = web_driver_wait.until(EC.element_to_be_clickable((By.ID, "input_1_2")))
+    phone_input = web_driver_wait.until(EC.element_to_be_clickable((By.ID, "input_1_5")))
+    
+    name_input.clear()
+    name_input.send_keys(data['name'])
     
     email_input.clear()
     email_input.send_keys(data['email'])
     
-    telefono_input.clear()
-    telefono_input.send_keys(str(data['phone']))
+    phone_input.clear()
+    phone_input.send_keys(str(data['phone']))
     
-    
+    fill_address(web_driver_wait, data)
+
 def fill_form(driver, data):
     """Rellena el formulario con los datos seleccionados"""
     try:
