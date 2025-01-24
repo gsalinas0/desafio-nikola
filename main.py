@@ -5,7 +5,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 import pandas as pd
+import os
 from consts import FORM_URL, DATABASE_PATH
+
+# TODO: Separar funciones en archivos
 
 def load_database():
     return pd.read_csv(DATABASE_PATH)
@@ -29,6 +32,19 @@ def select_record(data_options):
             selection = -1
     
     return data_options.iloc[selection]
+
+def start_driver():
+    chrome_install = ChromeDriverManager().install()
+
+    folder = os.path.dirname(chrome_install)
+    chromedriver_path = os.path.join(folder, "chromedriver.exe")
+    service = ChromeService(chromedriver_path)
+    
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--start-maximized')
+    
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+    return driver
 
 def fill_form(driver, data):
     """Rellena el formulario con los datos seleccionados"""
@@ -58,8 +74,7 @@ def main():
     data_options = load_database()
     selected_data = select_record(data_options)
     
-    service = ChromeService(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service)
+    driver = start_driver()
     
     try:
         # Abrir la página
