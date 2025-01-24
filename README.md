@@ -7,12 +7,23 @@ Script para rellenar el formulario de Nikola de manera automática. El script es
 - **Importante**: El script está pensado para ejecutarse en Windows.
 
 ## SetUp del proyecto
-Activar entorno virtual
+
+1. Crear el entorno virtual
 ```
-source venv/bin/activate
+python -m venv venv
 ```
 
-Desactivar entorno virtual
+2. Instalar las dependencias
+```
+pip install -r requirements.txt
+```
+
+3. Activar el entorno virtual
+```
+.\venv\Scripts\activate
+```
+
+4. Desactivar el entorno virtual
 ```
 deactivate
 ```
