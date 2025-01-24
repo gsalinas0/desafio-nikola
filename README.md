@@ -33,3 +33,6 @@ Para ejecutar el script, se debe correr el siguiente comando:
 ```
 python3 main.py
 ```
+## Tomar en cuenta
+- El script está configurado para que se ejecute en Chrome.
+- Podrían llegar a arrojarse excepciones si el formulario tarda mucho tiempo en cargar

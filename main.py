@@ -46,26 +46,32 @@ def start_driver():
     driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
 
+def fill_basic_info(wait_driver_wait, data):
+    
+    nombre_input = wait_driver_wait.until(EC.element_to_be_clickable((By.ID, "input_1_1_3")))
+    email_input = wait_driver_wait.until(EC.element_to_be_clickable((By.ID, "input_1_2")))
+    telefono_input = wait_driver_wait.until(EC.element_to_be_clickable((By.ID, "input_1_5")))
+    
+    nombre_input.clear()
+    nombre_input.send_keys(data['name'])
+    
+    email_input.clear()
+    email_input.send_keys(data['email'])
+    
+    telefono_input.clear()
+    telefono_input.send_keys(str(data['phone']))
+    
+    
 def fill_form(driver, data):
     """Rellena el formulario con los datos seleccionados"""
     try:
-        # Esperar a que los elementos del formulario estén presentes
         wait = WebDriverWait(driver, 10)
         
-        # Rellenar nombre
-        nombre_input = wait.until(EC.presence_of_element_located((By.NAME, "nombre")))
-        nombre_input.send_keys(data['nombre'])
+        wait.until(
+            lambda driver: driver.execute_script("return document.readyState") == "complete"
+        )
         
-        # Rellenar email
-        email_input = driver.find_element(By.NAME, "email")
-        email_input.send_keys(data['email'])
-        
-        # Rellenar teléfono
-        telefono_input = driver.find_element(By.NAME, "telefono")
-        telefono_input.send_keys(data['telefono'])
-        
-        # No enviamos el formulario automáticamente para permitir revisión
-        print("\nFormulario rellenado. Por favor, revise los datos antes de enviar manualmente.")
+        fill_basic_info(wait, data)
         
     except Exception as e:
         print(f"Error al rellenar el formulario: {str(e)}")
@@ -77,11 +83,9 @@ def main():
     driver = start_driver()
     
     try:
-        # Abrir la página
         driver.get(FORM_URL)
         
-        # Rellenar el formulario
-        # fill_form(driver, selected_data)
+        fill_form(driver, selected_data)
         
         # Mantener la ventana abierta hasta que el usuario decida cerrarla
         input("\nPresione Enter para cerrar el navegador...")
