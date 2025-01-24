@@ -1,0 +1,2 @@
+name,email,phone,address,structure_type,roofInclination,roofType,accountCost,reference,fileRoute
+Luis Hernandez,luis.hernandez@gmail.com,912345678,Avenida Chile España 105 Ñuñoa,Techo,Plano,Teja Asfáltica,100000,Google,uploadFiles/luis.pdf
