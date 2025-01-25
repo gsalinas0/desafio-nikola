@@ -11,6 +11,9 @@ from time import sleep
 from selenium.webdriver.common.keys import Keys
 
 # TODO: Separar funciones en archivos
+# TODO: juntar el como se rellenan los campos parecidos
+# TODO: Ver que el driver se cierra correctamente
+# TODO: Asegurarnos de que existe el documento
 
 def load_database():
     return pd.read_csv(DATABASE_PATH)
@@ -65,7 +68,7 @@ def fill_address(web_driver_wait, data):
     
     address_input.send_keys(Keys.RETURN)
 
-def fill_basic_info(web_driver_wait, data):
+def fill_text_fields(web_driver_wait, data):
     name_input = web_driver_wait.until(EC.element_to_be_clickable((By.ID, "input_1_1_3")))
     email_input = web_driver_wait.until(EC.element_to_be_clickable((By.ID, "input_1_2")))
     phone_input = web_driver_wait.until(EC.element_to_be_clickable((By.ID, "input_1_5")))
@@ -81,7 +84,7 @@ def fill_basic_info(web_driver_wait, data):
     
     fill_address(web_driver_wait, data)
 
-def fill_structure_info(web_driver_wait, data):
+def fill_select_fields(web_driver_wait, data):
     structure_select = web_driver_wait.until(EC.element_to_be_clickable((By.ID, "input_1_24")))
     structure_select.click()
     structure_select.send_keys(data['structureType'])
@@ -98,6 +101,41 @@ def fill_structure_info(web_driver_wait, data):
             roof_type_select.click()
             roof_type_select.send_keys(data['roofInclination'])
             roof_type_select.send_keys(Keys.RETURN)
+            
+    reference_select = web_driver_wait.until(EC.element_to_be_clickable((By.ID, "input_1_34")))
+    reference_select.click()
+    reference_select.send_keys(data['reference'])
+    reference_select.send_keys(Keys.RETURN)
+    
+def fill_slider(web_driver_wait, data):
+    # NO BORRES ESTE COMENTARIO
+    # slider = web_driver_wait.until(EC.presence_of_element_located((By.CLASS_NAME, "noUi-handle")))
+
+    # min_value = float(slider.get_attribute("aria-valuemin"))
+    # max_value = float(slider.get_attribute("aria-valuemax"))
+    # target_value = float(data['accountCost'])
+    
+    # percentage = (target_value - min_value) / (max_value - min_value)
+    
+    # offset = int(slider.size['width'] * percentage)
+    
+    # print(offset)
+    
+    # webdriver.ActionChains(web_driver_wait._driver).drag_and_drop_by_offset(slider, offset, 0).perform()
+    
+    
+    web_driver_wait.until(EC.presence_of_element_located((By.CLASS_NAME, "noUi-target")))
+    target_value = float(data['accountCost'])
+    
+    script = f"document.querySelector('.noUi-target').noUiSlider.set({target_value})"
+    web_driver_wait._driver.execute_script(script)
+
+def upload_file(web_driver_wait, data):
+    
+    if 'fileRoute' in data and not pd.isna(data['fileRoute']):
+        file_path = os.path.join('data', 'uploadFiles', data['fileRoute'])
+        file_input = web_driver_wait.until(EC.presence_of_element_located((By.ID, "input_1_27")))
+        file_input.send_keys(os.path.abspath(file_path))
 
 def fill_form(driver, data):
     try:
@@ -107,9 +145,10 @@ def fill_form(driver, data):
             lambda driver: driver.execute_script("return document.readyState") == "complete"
         )
         
-        fill_basic_info(wait, data)
-        
-        fill_structure_info(wait, data)
+        fill_text_fields(wait, data)
+        fill_select_fields(wait, data)
+        fill_slider(wait, data)
+        upload_file(wait, data)
 
     except Exception as e:
         print(f"Error al rellenar el formulario: {str(e)}")
