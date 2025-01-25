@@ -48,11 +48,10 @@ def start_driver():
     driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
 
-def fill_address(wait_driver_wait, data):
-    address_input = wait_driver_wait.until(EC.element_to_be_clickable((By.ID, "input_1_20")))
+def fill_address(web_driver_wait, data):
+    address_input = web_driver_wait.until(EC.element_to_be_clickable((By.ID, "input_1_20")))
     
-    # Esperar a que el componente de Google Maps se inicialice
-    wait_driver_wait.until(
+    web_driver_wait.until(
         lambda driver: driver.execute_script(
             'return document.querySelector("#input_1_20").getAttribute("class").includes("pac-target-input")'
         )
@@ -60,7 +59,7 @@ def fill_address(wait_driver_wait, data):
 
     address_input.clear()
     address_input.send_keys(data['address'])
-    wait_driver_wait.until(
+    web_driver_wait.until(
         EC.presence_of_element_located((By.CLASS_NAME, "pac-container"))
     )
     
@@ -82,8 +81,25 @@ def fill_basic_info(web_driver_wait, data):
     
     fill_address(web_driver_wait, data)
 
+def fill_structure_info(web_driver_wait, data):
+    structure_select = web_driver_wait.until(EC.element_to_be_clickable((By.ID, "input_1_24")))
+    structure_select.click()
+    structure_select.send_keys(data['structureType'])
+    structure_select.send_keys(Keys.RETURN)
+    
+    if data['structureType'] == 'Techo' or data['structureType'] == 'Carport':
+        roof_material_select = web_driver_wait.until(EC.element_to_be_clickable((By.ID, "input_1_26")))
+        roof_material_select.click()
+        roof_material_select.send_keys(data['roofType'])
+        roof_material_select.send_keys(Keys.RETURN)
+        
+        if data['structureType'] == 'Techo':
+            roof_type_select = web_driver_wait.until(EC.element_to_be_clickable((By.ID, "input_1_25")))
+            roof_type_select.click()
+            roof_type_select.send_keys(data['roofInclination'])
+            roof_type_select.send_keys(Keys.RETURN)
+
 def fill_form(driver, data):
-    """Rellena el formulario con los datos seleccionados"""
     try:
         wait = WebDriverWait(driver, 10)
         
@@ -93,6 +109,8 @@ def fill_form(driver, data):
         
         fill_basic_info(wait, data)
         
+        fill_structure_info(wait, data)
+
     except Exception as e:
         print(f"Error al rellenar el formulario: {str(e)}")
 

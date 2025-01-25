@@ -36,3 +36,6 @@ python3 main.py
 ## Tomar en cuenta
 - El script está configurado para que se ejecute en Chrome.
 - Podrían llegar a arrojarse excepciones si el formulario tarda mucho tiempo en cargar
+
+## Supuestos
+- Se asume que todos los datos que irán en el csv serán correctos. *Por ejemplo, en los selectores solo se tendremos opciones válidas*, aunque no siempre se ocuparán todos los campos. *Por ejemplo si el tipo de instalación es "Suelo" no usaremos el campo de inclinación*.
