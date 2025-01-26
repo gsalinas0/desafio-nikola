@@ -33,10 +33,15 @@ Para ejecutar el script, se debe correr el siguiente comando:
 ```
 python3 main.py
 ```
-## Tomar en cuenta
+## Consideraciones
 - El script está configurado para que se ejecute en Chrome.
-- Podrían llegar a arrojarse excepciones si el formulario tarda mucho tiempo en cargar
-- Los datos se cargan desde el archivo `data/database.csv`. Para la parte de subir el archivo, se debe escribir el nombre del archivo (o su ruta relativa) y guardarlo en la carpeta `data/uploadFiles`. *Por ejemplo, si el archivo se llama `luis.pdf` se debe escribir `luis.pdf` y guardarlo en la carpeta `data/uploadFiles`*. Se asume que los archivos siempre estarán en la carpeta
+- Se asume que todos los datos que irán en el csv serán correctos. *Por ejemplo, en los selectores solo tendremos opciones válidas*.
+- No siempre se ocuparán todos los campos. *Por ejemplo si el tipo de instalación es "Suelo" no usaremos el campo de inclinación*.
+- Los datos se cargan desde el archivo `data/database.csv`. 
 
-## Supuestos
-- Se asume que todos los datos que irán en el csv serán correctos. *Por ejemplo, en los selectores solo se tendremos opciones válidas*, aunque no siempre se ocuparán todos los campos. *Por ejemplo si el tipo de instalación es "Suelo" no usaremos el campo de inclinación*.
+| name | email | phone | address | structureType | roofInclination | roofType | accountCost | reference | fileRoute |
+|------|--------|-------|----------|--------------|-----------------|----------|-------------|-----------|-----------|
+| Luis Hernandez | luis.hernandez@gmail.com | 912345678 | Avenida Chile España 105 Ñuñoa | Techo | Plano | Teja Asfáltica | 100000 | Google | luis.pdf |
+
+En fileRoute se debe especificar el nombre del archivo a subir, y colocarlo en la carpeta `data/uploadFiles`. Para efectos de llenado del formulario se asumirá que el archivo existe. Si no se llena este campo, se asumirá que no se subirá ningún archivo.
+- Con respecto al slider, se ubicará en la posición más cercana al valor de accountCost.

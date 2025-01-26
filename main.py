@@ -4,14 +4,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.keys import Keys
 import pandas as pd
 import os
 from consts import FORM_URL, DATABASE_PATH
-from time import sleep
-from selenium.webdriver.common.keys import Keys
 
-# TODO: Separar funciones en archivos
-# TODO: juntar el como se rellenan los campos parecidos
 # TODO: Ver que el driver se cierra correctamente
 # TODO: Asegurarnos de que existe el documento
 
@@ -51,6 +48,11 @@ def start_driver():
     driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
 
+def fill_input_field(web_driver_wait, field_id, value):
+    input_element = web_driver_wait.until(EC.element_to_be_clickable((By.ID, field_id)))
+    input_element.clear()
+    input_element.send_keys(str(value))
+
 def fill_address(web_driver_wait, data):
     address_input = web_driver_wait.until(EC.element_to_be_clickable((By.ID, "input_1_20")))
     
@@ -69,18 +71,9 @@ def fill_address(web_driver_wait, data):
     address_input.send_keys(Keys.RETURN)
 
 def fill_text_fields(web_driver_wait, data):
-    name_input = web_driver_wait.until(EC.element_to_be_clickable((By.ID, "input_1_1_3")))
-    email_input = web_driver_wait.until(EC.element_to_be_clickable((By.ID, "input_1_2")))
-    phone_input = web_driver_wait.until(EC.element_to_be_clickable((By.ID, "input_1_5")))
-    
-    name_input.clear()
-    name_input.send_keys(data['name'])
-    
-    email_input.clear()
-    email_input.send_keys(data['email'])
-    
-    phone_input.clear()
-    phone_input.send_keys(str(data['phone']))
+    fill_input_field(web_driver_wait, "input_1_1_3", data['name'])
+    fill_input_field(web_driver_wait, "input_1_2", data['email'])
+    fill_input_field(web_driver_wait, "input_1_5", data['phone'])
     
     fill_address(web_driver_wait, data)
 
@@ -108,30 +101,27 @@ def fill_select_fields(web_driver_wait, data):
     reference_select.send_keys(Keys.RETURN)
     
 def fill_slider(web_driver_wait, data):
-    # NO BORRES ESTE COMENTARIO
-    # slider = web_driver_wait.until(EC.presence_of_element_located((By.CLASS_NAME, "noUi-handle")))
-
-    # min_value = float(slider.get_attribute("aria-valuemin"))
-    # max_value = float(slider.get_attribute("aria-valuemax"))
-    # target_value = float(data['accountCost'])
+    slider = web_driver_wait.until(EC.presence_of_element_located((By.CLASS_NAME, "noUi-handle")))
+    slider_container = web_driver_wait.until(EC.presence_of_element_located((By.CLASS_NAME, "noUi-base")))
     
-    # percentage = (target_value - min_value) / (max_value - min_value)
-    
-    # offset = int(slider.size['width'] * percentage)
-    
-    # print(offset)
-    
-    # webdriver.ActionChains(web_driver_wait._driver).drag_and_drop_by_offset(slider, offset, 0).perform()
-    
-    
-    web_driver_wait.until(EC.presence_of_element_located((By.CLASS_NAME, "noUi-target")))
+    total_width = slider_container.size['width']
+    min_value = float(slider.get_attribute("aria-valuemin"))
+    max_value = float(slider.get_attribute("aria-valuemax"))
     target_value = float(data['accountCost'])
+    current_value = float(slider.get_attribute("aria-valuenow"))
     
-    script = f"document.querySelector('.noUi-target').noUiSlider.set({target_value})"
-    web_driver_wait._driver.execute_script(script)
+    target_percentage = (target_value - min_value) / (max_value - min_value)
+    current_percentage = (current_value - min_value) / (max_value - min_value)
+    
+    pixel_difference = int((target_percentage - current_percentage) * total_width)
+    
+    action = webdriver.ActionChains(web_driver_wait._driver)
+    action.click_and_hold(slider)
+    action.move_by_offset(pixel_difference, 0)
+    action.release()
+    action.perform()
 
 def upload_file(web_driver_wait, data):
-    
     if 'fileRoute' in data and not pd.isna(data['fileRoute']):
         file_path = os.path.join('data', 'uploadFiles', data['fileRoute'])
         file_input = web_driver_wait.until(EC.presence_of_element_located((By.ID, "input_1_27")))
@@ -157,9 +147,8 @@ def main():
     data_options = load_database()
     selected_data = select_record(data_options)
     
-    driver = start_driver()
-    
     try:
+        driver = start_driver()
         driver.get(FORM_URL)
         
         fill_form(driver, selected_data)
