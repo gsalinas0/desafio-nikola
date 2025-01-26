@@ -7,10 +7,9 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.keys import Keys
 import pandas as pd
 import os
+import time
 from consts import FORM_URL, DATABASE_PATH
 
-# TODO: Ver que el driver se cierra correctamente
-# TODO: Asegurarnos de que existe el documento
 
 def load_database():
     return pd.read_csv(DATABASE_PATH)
@@ -82,12 +81,16 @@ def fill_select_field(web_driver_wait, field_id, value):
     select_element.click()
     select_element.send_keys(str(value))
     select_element.send_keys(Keys.RETURN)
+    time.sleep(1)
 
 def fill_select_fields(web_driver_wait, data):
     fill_select_field(web_driver_wait, "input_1_24", data['structureType'])
     
     if data['structureType'] == 'Techo' or data['structureType'] == 'Carport':
         fill_select_field(web_driver_wait, "input_1_26", data['roofType'])
+        
+        if 'Otro' in data['roofType']:
+            fill_input_field(web_driver_wait, "input_1_29", data['roofType'].split('-')[1])
         
         if data['structureType'] == 'Techo':
             fill_select_field(web_driver_wait, "input_1_25", data['roofInclination'])
@@ -147,7 +150,6 @@ def main():
         
         fill_form(driver, selected_data)
         
-        # Mantener la ventana abierta hasta que el usuario decida cerrarla
         input("\nPresione Enter para cerrar el navegador...")
         
     finally:
