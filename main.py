@@ -77,29 +77,23 @@ def fill_text_fields(web_driver_wait, data):
     
     fill_address(web_driver_wait, data)
 
+def fill_select_field(web_driver_wait, field_id, value):
+    select_element = web_driver_wait.until(EC.element_to_be_clickable((By.ID, field_id)))
+    select_element.click()
+    select_element.send_keys(str(value))
+    select_element.send_keys(Keys.RETURN)
+
 def fill_select_fields(web_driver_wait, data):
-    structure_select = web_driver_wait.until(EC.element_to_be_clickable((By.ID, "input_1_24")))
-    structure_select.click()
-    structure_select.send_keys(data['structureType'])
-    structure_select.send_keys(Keys.RETURN)
+    fill_select_field(web_driver_wait, "input_1_24", data['structureType'])
     
     if data['structureType'] == 'Techo' or data['structureType'] == 'Carport':
-        roof_material_select = web_driver_wait.until(EC.element_to_be_clickable((By.ID, "input_1_26")))
-        roof_material_select.click()
-        roof_material_select.send_keys(data['roofType'])
-        roof_material_select.send_keys(Keys.RETURN)
+        fill_select_field(web_driver_wait, "input_1_26", data['roofType'])
         
         if data['structureType'] == 'Techo':
-            roof_type_select = web_driver_wait.until(EC.element_to_be_clickable((By.ID, "input_1_25")))
-            roof_type_select.click()
-            roof_type_select.send_keys(data['roofInclination'])
-            roof_type_select.send_keys(Keys.RETURN)
+            fill_select_field(web_driver_wait, "input_1_25", data['roofInclination'])
             
-    reference_select = web_driver_wait.until(EC.element_to_be_clickable((By.ID, "input_1_34")))
-    reference_select.click()
-    reference_select.send_keys(data['reference'])
-    reference_select.send_keys(Keys.RETURN)
-    
+    fill_select_field(web_driver_wait, "input_1_34", data['reference'])
+
 def fill_slider(web_driver_wait, data):
     slider = web_driver_wait.until(EC.presence_of_element_located((By.CLASS_NAME, "noUi-handle")))
     slider_container = web_driver_wait.until(EC.presence_of_element_located((By.CLASS_NAME, "noUi-base")))
