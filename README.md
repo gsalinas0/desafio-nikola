@@ -8,22 +8,22 @@ Script para rellenar el formulario de Nikola de manera automática. El script es
 
 ## SetUp del proyecto
 
-1. Crear el entorno virtual
+1. Crear el entorno virtual (dentro del proyecto)
 ```
 python -m venv venv
 ```
 
-2. Instalar las dependencias
-```
-pip install -r requirements.txt
-```
-
-3. Activar el entorno virtual
+2. Activar el entorno virtual 
 ```
 .\venv\Scripts\activate
 ```
 
-4. Desactivar el entorno virtual
+3. Instalar las dependencias
+```
+pip install -r requirements.txt
+```
+
+(Opcional) Desactivar el entorno virtual una vez corrido el script
 ```
 deactivate
 ```
@@ -31,7 +31,7 @@ deactivate
 ## Ejecución
 Para ejecutar el script, se debe correr el siguiente comando:
 ```
-python3 main.py
+python main.py
 ```
 ## Consideraciones
 - El script está configurado para que se ejecute en Chrome.
@@ -45,5 +45,5 @@ python3 main.py
 
 * Si en roofType se especifica "Otro", se debe especificar el material seguido de un "-".
 
-En fileRoute se debe especificar el nombre del archivo a subir, y colocarlo en la carpeta `data/uploadFiles`. Para efectos de llenado del formulario se asumirá que el archivo existe. Si no se llena este campo, se asumirá que no se subirá ningún archivo.
+- En fileRoute se debe especificar el nombre del archivo a subir, y colocarlo en la carpeta `data/uploadFiles`. Para efectos de llenado del formulario se asumirá que el archivo existe. Si no se llena este campo, se asumirá que no se subirá ningún archivo.
 - Con respecto al slider, se ubicará en la posición más cercana al valor de accountCost.
